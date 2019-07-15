@@ -1,4 +1,4 @@
-# Storage Servicesss
+# Storage Services
 
 ## Deploy
 
@@ -14,10 +14,10 @@ docker stop storage_save && docker rm storage_save
 
 ```json
 {
-    "bucket": "name", // bucket name
-    "acl": "public-read", // private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write
-    "path": "upload/test/", // directory path
-    "key": "upload/image_1.jpeg", // the original file path
+    "bucket": "name",
+    "acl": "public-read",
+    "path": "upload/test/",
+    "key": "upload/image_1.jpeg",
     "resizes": [{
         "width": 530,
         "height": 795
@@ -27,3 +27,4 @@ docker stop storage_save && docker rm storage_save
     }]
 }
 ```
+*note acl*: private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write
