@@ -1,14 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const controller = require('./controller')
+const controller = require('./controller');
+require('dotenv').config();
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }))
+
+const multer = require('multer');
+const upload = multer();
+
+var mime = require('mime-types')
+
 
 const BUCKET = process.env.BUCKET
 
-app.get('/', function (req, response) {
-    response.send('');
+app.get('/', function (req, res) {
+    res.send('<title>GO::GO::GO</title>');
 });
 
 app.post('/resize', async function (req, res) {
@@ -17,14 +25,23 @@ app.post('/resize', async function (req, res) {
         var uploads = []
         await Promise.all(config.resizes.map(async (size) => {
             const { data, info } = await controller.resize(Body, size).then(data => data).catch(err => res.status(400).json(err))
-            const { Location, Key, Bucket } = await controller.upload({ data, bucket: config.bucket, acl: config.acl, contentType: ContentType, path: config.path, format: info.format })
-            uploads.push({ location: Location, key: Key, bucket: Bucket, width: size.width, height: size.height });
+            const { Location, Key } = await controller.upload({ data, acl: config.acl, contentType: ContentType, path: config.path, format: info.format })
+            uploads.push({ location: Location, key: Key, width: size.width, height: size.height });
         }))
         res.json(uploads)
     }).catch(err => {
         console.log(err)
         res.status(400).json(err)
     });
+});
+
+app.post('/upload', upload.single('file'), async function(req, res){
+    const { width, height, acl, path, location } = req.body;
+    const contentType = mime.lookup(req.file.originalname);
+    const { data, info } = await controller.resize(req.file.buffer, { width, height }).then(data => data).catch(err => res.status(400).json(err))
+
+    const { Location, Key } = await controller.upload({ data, acl, contentType, path: location + path, format: info.format })
+    res.json({ location: Location, key: Key, path: Key.replace(location, ''), width, height }).status(201);
 });
 
 const server = app.listen(process.env.PORT || 3000, () => {
