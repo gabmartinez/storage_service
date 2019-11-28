@@ -3,11 +3,11 @@
 ## Deploy
 
 ```bash
-docker build -t storage_save .
-docker run --env-file .env --name storage_save -d -p 127.0.0.1:3000:3000 storage_save
+docker build -t storage_service .
+docker run --env-file .env --name storage_service -d -p 127.0.0.1:5000:5000 storage_service
 
 docker logs -f --details storage_save
-docker stop storage_save && docker rm storage_save
+docker stop storage_service && docker rm storage_service
 ```
 
 ## Request
